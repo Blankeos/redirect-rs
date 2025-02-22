@@ -8,10 +8,10 @@ struct IndexResponse {
 
 #[actix::get("/")]
 async fn index(req: actix::HttpRequest) -> impl actix::Responder {
-    // Get the host from the request headers
+    let protocol = req.connection_info().scheme().to_string();
     let host = req.connection_info().host().to_string();
 
-    let base_url = format!("http://{}", host);
+    let base_url = format!("{}://{}", protocol, host);
 
     actix::web::Json(IndexResponse {
         message: format!("To get started, pass {}/{{your url here}}", base_url),

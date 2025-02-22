@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/redirect.rs": {
+      "runtime": "vercel-rust@4.0.8"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/:redirect_url(.*)",
+      "destination": "/api/redirect"
+    }
+  ]
+}
