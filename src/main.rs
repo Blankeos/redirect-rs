@@ -1,4 +1,4 @@
-use actix_web::{self as actix};
+use actix_web::{self as actix, HttpRequest};
 
 #[derive(serde::Serialize)]
 struct IndexResponse {
@@ -23,17 +23,25 @@ async fn index(req: actix::HttpRequest) -> impl actix::Responder {
 }
 
 #[actix::get("/{url:.*}")]
-async fn redirect(path: actix::web::Path<String>) -> impl actix::Responder {
+async fn redirect(path: actix::web::Path<String>, req: HttpRequest) -> impl actix::Responder {
     let redirect_url = path.into_inner();
 
     if redirect_url.is_empty() {
         return actix::HttpResponse::BadRequest().body("URL cannot be empty");
     }
 
-    println!("Redirecting to: {}", redirect_url);
+    let query_string = if let Some(query) = req.uri().query() {
+        format!("?{}", query)
+    } else {
+        String::new()
+    };
+
+    let final_url = format!("{}{}", redirect_url, query_string);
+
+    println!("Redirecting to: {}", final_url);
 
     actix::HttpResponse::TemporaryRedirect()
-        .append_header(("Location", redirect_url))
+        .append_header(("Location", final_url))
         .finish()
 }
 
